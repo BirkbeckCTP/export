@@ -1,0 +1,117 @@
+
+<html>
+<head>
+    <title>[{{ journal.code }}] #{{ article.pk }} {{ article.title }}</title>
+</head>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+      integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+<body>
+<div class="container-fluid">
+    <h1>Article Data</h1>
+    <h2>General Info</h2>
+    <table class="table table-bordered">
+        <tr>
+            <th width="20%">Journal</th>
+            <td>{{ journal.name }}</td>
+        </tr>
+        <tr>
+            <th width="20%">ID</th>
+            <td>{{ article.pk }}</td>
+        </tr>
+        <tr>
+            <th width="20%">Title</th>
+            <td>{{ article.title|safe }}</td>
+        </tr>
+        <tr>
+            <th width="20%">Section</th>
+            <td>{{ article.section.name }}</td>
+        </tr>
+        <tr>
+            <th width="20%">Correspondence Author</th>
+            <td>{{ article.correspondence_author.full_name }}</td>
+        </tr>
+        <tr>
+            <th width="20%">Licence</th>
+            <td>{{ article.license.name }}</td>
+        </tr>
+        <tr>
+            <th width="20%">Language</th>
+            <td>{{ article.get_language_display }}</td>
+        </tr>
+        <tr>
+            <th width="20%">Abstract</th>
+            <td>{{ article.abstract|safe }}</td>
+        </tr>
+        <tr>
+            <th width="20%">Keywords</th>
+            <td>{% for keyword in article.keywords.all %}{{ keyword }}{% if not forloop.last %}, {% endif %}{% empty %}No keywords recorded{% endfor %}</td>
+        </tr>
+
+        <tr>
+            <th width="20%">Comments to the Editor</th>
+            <td>{{ article.comments_editor|safe }}</td>
+        </tr>
+
+
+    </table>
+    <h2>Authors</h2>
+    <table class="table table-bordered">
+        <tr>
+            <th>First Name</th>
+            <th>Middle Name</th>
+            <th>Last name</th>
+            <th>Email Address</th>
+            <th>Affiliation</th>
+            <th>ORCiD</th>
+        </tr>
+        {% for ao in article.frozenauthor_set.all %}
+            <tr>
+                <td>{{ ao.first_name }}</td>
+                <td>{{ ao.middle_name }}</td>
+                <td>{{ ao.last_name }}</td>
+                <td>{{ ao.author.email }}</td>
+                <td>{{ ao.affiliation }}</td>
+                <td>{{ ao.author.orcid }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    <h2>Files</h2>
+    <table class="table table-bordered">
+        <tr>
+            <th>ID</th>
+            <th>Original Filename</th>
+            <th>Janeway Filename</th>
+            <th>Download Link</th>
+        </tr>
+        {% for file in files %}
+        <tr>
+            <td>{{ file.pk }}</td>
+            <td>{{ file.original_filename }}</td>
+            <td>{{ file.uuid_filename }}</td>
+            <td><a href="{% url 'article_file_download' 'id' article.pk file.pk %}">Download</a></td>
+        </tr>
+        {% endfor %}
+
+    </table>
+    <h2>Dates</h2>
+    <table class="table table-bordered">
+        <tr>
+            <th width="20%">Started</th>
+            <td>{{ article.date_started }}</td>
+        </tr>
+        <tr>
+            <th width="20%">Submitted</th>
+            <td>{{ article.date_submitted }}</td>
+        </tr>
+        {% for log in article.articlestagelog_set.all reversed %}
+        <tr>
+            <th>[Moved to Stage]<br />{{ log.stage_to }}</th>
+            <td>{{ log.date_time }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</div>a
+</body>
+</html>

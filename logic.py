@@ -8,13 +8,20 @@ from django.template.loader import render_to_string
 from core import files, models as core_models
 
 
-def export_csv(request, article):
+def export_csv(request, article, article_files):
     pass
 
 
-def export_html(request, article):
+def export_html(request, article, article_files):
     html_file_path = files.create_temp_file(
-        '<h1>Test</h1>',
+        render_to_string(
+            'export/export.html',
+            context = {
+                'article': article,
+                'journal': request.journal,
+                'files': article_files,
+            }
+        ),
         '{code}-{pk}.html'.format(
             code=article.journal.code,
             pk=article.pk,
@@ -26,10 +33,10 @@ def export_html(request, article):
     zip_file = zipfile.ZipFile(zip_path, mode='w')
     zip_file.write(
         html_file_path,
-        os.path.basename(html_file_path)
+        'article_data.html'
     )
 
-    for file in core_models.File.objects.filter(article_id=article.pk):
+    for file in article_files:
         zip_file.write(
             file.self_article_path(),
             file.original_filename,

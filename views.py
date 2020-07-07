@@ -4,6 +4,7 @@ from django.http import Http404
 from plugins.export import forms, plugin_settings, logic
 from submission import models
 from security import decorators
+from core import models as core_models
 
 
 @decorators.has_journal
@@ -61,10 +62,26 @@ def export_article(request, article_id, format='csv'):
         journal=request.journal,
         stage=plugin_settings.STAGE,
     )
+    files = core_models.File.objects.filter(
+        article_id=article.pk,
+    )
+
+    if request.GET.get('action') == 'output_html':
+        context = {
+            'article': article,
+            'journal': request.journal,
+            'files': files,
+        }
+
+        return render(
+            request,
+            'export/export.html',
+            context,
+        )
 
     if format == 'csv':
-        return logic.export_csv(request, article)
+        return logic.export_csv(request, article, files)
     elif format == 'html':
-        return logic.export_html(request, article)
+        return logic.export_html(request, article, files)
 
     raise Http404

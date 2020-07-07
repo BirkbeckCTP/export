@@ -24,6 +24,7 @@
                         <th>Section</th>
                         <th>No. Active Reviews</th>
                         <th>No. Complete Reviews</th>
+                        <th>Archive</th>
                         <th>Export CSV</th>
                         <th>Export HTML</th>
                     </tr>
@@ -39,6 +40,7 @@
                         <td>{{ article.section.name }}</td>
                         <td>{{ article.active_reviews|length }}</td>
                         <td>{{ article.completed_reviews|length }}</td>
+                        <td><a target="_blank" class="small secondary button" href="{% url 'manage_archive_article' article.pk %}"><span class="fa fa-sticky-note"></span></a></td>
                         <td>
                             <a class="small secondary button" href="{% url 'export_article' article.pk 'csv' %}"><span class="fa fa-download"></span> </a>
                         </td>
