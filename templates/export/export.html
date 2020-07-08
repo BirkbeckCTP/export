@@ -17,6 +17,10 @@
     {% include "export/elements/files.html" %}
     <h2>Dates</h2>
     {% include "export/elements/dates.html" %}
+    {% if article.funders %}
+    <h2>Funding</h2>
+    {% include "export/elements/funding.html" %}
+    {% endif %}
 
 </div>a
 </body>

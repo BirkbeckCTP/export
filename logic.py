@@ -33,6 +33,7 @@ def export_csv(request, article, article_files):
         'authors.html',
         'files.html',
         'dates.html',
+        'funding.html',
     ]
 
     context = {
