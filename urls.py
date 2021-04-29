@@ -13,4 +13,5 @@ urlpatterns = [
         views.export_article,
         name='export_article',
         ),
+    url(r'^articles/all/$', views.export_articles_all, name='export_articles_all'),
 ]

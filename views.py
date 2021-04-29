@@ -15,11 +15,8 @@ def manager(request):
     :param request: HttpRequest object
     :return: HttpReponse or HttpRedirect
     """
-    form = forms.DummyManagerForm()
-
     template = 'export/manager.html'
     context = {
-        'form': form,
     }
 
     return render(request, template, context)
@@ -56,12 +53,20 @@ def export_article(request, article_id, format='csv'):
     :param format: string, csv or html
     :return: HttpResponse or Http404
     """
-    article = get_object_or_404(
-        models.Article,
-        pk=article_id,
-        journal=request.journal,
-        stage=plugin_settings.STAGE,
-    )
+    in_stage = request.GET.get('in_stage', 'true')
+    if in_stage == 'true':
+        article = get_object_or_404(
+            models.Article,
+            pk=article_id,
+            journal=request.journal,
+            stage=plugin_settings.STAGE,
+        )
+    else:
+        article = get_object_or_404(
+            models.Article,
+            pk=article_id,
+            journal=request.journal,
+        )
     files = core_models.File.objects.filter(
         article_id=article.pk,
     )
@@ -85,3 +90,23 @@ def export_article(request, article_id, format='csv'):
         return logic.export_html(request, article, files)
 
     raise Http404
+
+
+@decorators.has_journal
+@decorators.editor_user_required
+def export_articles_all(request):
+    """
+    A view that displays all articles in a journal and allows export.
+    """
+    articles = models.Article.objects.filter(
+        journal=request.journal,
+    ).select_related(
+        'correspondence_author',
+    )
+
+    template = 'export/articles_all.html'
+    context = {
+        'articles_in_stage': articles,
+    }
+
+    return render(request, template, context)
