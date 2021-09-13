@@ -6,7 +6,8 @@ import csv
 from bs4 import BeautifulSoup
 
 from django.template.loader import render_to_string
-
+from django.utils import translation
+from django.conf import settings
 
 from core import files, models as core_models
 
@@ -26,6 +27,7 @@ def html_table_to_csv(html):
 
     f.close()
     return filepath
+
 
 def export_csv(request, article, article_files):
     elements = [
@@ -71,20 +73,21 @@ def export_csv(request, article, article_files):
 
 
 def export_html(request, article, article_files):
-    html_file_path = files.create_temp_file(
-        render_to_string(
-            'export/export.html',
-            context = {
-                'article': article,
-                'journal': request.journal,
-                'files': article_files,
-            }
-        ),
-        '{code}-{pk}.html'.format(
-            code=article.journal.code,
-            pk=article.pk,
+    with translation.override(settings.LANGUAGE_CODE):
+        html_file_path = files.create_temp_file(
+            render_to_string(
+                'export/export.html',
+                context={
+                    'article': article,
+                    'journal': request.journal,
+                    'files': article_files,
+                }
+            ),
+            '{code}-{pk}.html'.format(
+                code=article.journal.code,
+                pk=article.pk,
+            )
         )
-    )
 
     zip_file_name = 'export_{}_{}_html.zip'.format(article.journal.code, article.pk)
     zip_path = os.path.join(files.TEMP_DIR, zip_file_name)
