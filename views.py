@@ -1,5 +1,6 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect, reverse
 from django.http import Http404
+from django.contrib import messages
 
 from plugins.export import forms, plugin_settings, logic
 from submission import models
@@ -34,6 +35,31 @@ def export_articles(request):
         journal=request.journal,
         stage=plugin_settings.STAGE,
     )
+
+    if request.POST and 'archive' in request.POST:
+        id_to_archive = request.POST.get('archive')
+        try:
+            article_to_archive = articles_in_stage.get(
+                pk=id_to_archive,
+            )
+            article_to_archive.stage = models.STAGE_ARCHIVED
+            article_to_archive.save()
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                'Article archived.',
+            )
+        except models.Article.DoesNotExist:
+            messages.add_message(
+                request,
+                messages.WARNING,
+                'No article with ID {} found in this stage.'.format(id_to_archive),
+            )
+        return redirect(
+            reverse(
+                'export_articles',
+            )
+        )
 
     template = 'export/articles.html'
     context = {
