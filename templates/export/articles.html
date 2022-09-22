@@ -24,7 +24,8 @@
                         <th>Section</th>
                         <th>No. Active Reviews</th>
                         <th>No. Complete Reviews</th>
-                        <th>Archive</th>
+                        <th>View Archive Page</th>
+                        <th>Archive Article</th>
                         <th>Export CSV</th>
                         <th>Export HTML</th>
                     </tr>
@@ -41,6 +42,12 @@
                         <td>{{ article.active_reviews|length }}</td>
                         <td>{{ article.completed_reviews|length }}</td>
                         <td><a target="_blank" class="small secondary button" href="{% url 'manage_archive_article' article.pk %}"><span class="fa fa-sticky-note"></span></a></td>
+                        <td>
+                            <form method="POST">
+                                {% csrf_token %}
+                                <button name="archive" value="{{ article.pk }}" class="small warning button">Archive Article</button>
+                            </form>
+                        </td>
                         <td>
                             <a class="small secondary button" href="{% url 'export_article' article.pk 'csv' %}"><span class="fa fa-download"></span> </a>
                         </td>
