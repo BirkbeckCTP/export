@@ -1,0 +1,16 @@
+<div class="card">
+    <div class="card-divider">
+        <h5>{{ article.pk }} - {{ article.title|safe }}</h5>
+    </div>
+    <div class="card-section">
+        <p>Article is available for export.</p>
+        <div class="button-group">
+            <a class="button tiny" href="{% url 'export_articles' %}">View Exports</a>
+        </div>
+    </div>
+    <div class="card-divider">
+        {% for assignment in article.editors %}
+            {% include "elements/avatar.html" with user=assignment.editor role=assignment.editor_type %}
+        {% endfor %}
+    </div>
+</div>
